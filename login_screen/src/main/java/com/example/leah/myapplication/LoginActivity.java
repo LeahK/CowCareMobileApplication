@@ -14,6 +14,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.content.*;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -29,11 +30,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.*;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.*;
+import android.util.*;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -300,50 +308,77 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
+        String request  = "http://private-a59ad-katyscareapi.apiary-mock.com/tokens?include=users";
 
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
         }
 
+        protected String makeLoginRequest(){
+            JSONObject postData = new JSONObject();
+            try {
+                postData.put("username", mEmail);
+                postData.put("password", mPassword);
+            } catch (JSONException e){
+                Log.i("makeRequestJSON", "Impossible Error");
+            }
+            return postData.toString();
+        }
+
+        protected String getHttpResponse(HttpURLConnection conn) {
+            String response = "";
+            StringBuilder sb = new StringBuilder();
+            try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line.concat("\n"));
+                }
+                br.close();
+                response = sb.toString();
+            } catch (Exception e){
+                Log.i("getHttpResponse", "Impossible Error");
+            }
+            return response;
+        }
+
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+            Boolean result = true;
 
             try {
-                // Simulate network access.
-                //Thread.sleep(2000);
+                String postData = makeLoginRequest();
+                URL url = new URL(request);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setInstanceFollowRedirects(false);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Accepts", "application/json");
+                conn.setRequestProperty("charset", "utf-8");
+                conn.setUseCaches(false);
 
-                //
-                JSONObject jsonObj = new JSONObject();
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+                wr.write(postData);
+                wr.flush();
 
-                jsonObj.put("username", mEmail);
-                jsonObj.put("password", mPassword);
-
-
-                // Create the POST object and add the parameters
-
-                HttpPost httpPost = new HttpPost(url);
-
-                StringEntity entity = new StringEntity(jsonObj.toString(), HTTP.UTF_8);
-                //
-
-            } catch (InterruptedException e) {
-                return false;
-            } catch (org.json.JSONException e){
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
+                    JSONObject resp = new JSONObject(getHttpResponse(conn));
+                    JSONObject data = resp.getJSONObject("data");
+                    String token = data.getString("id");
+                    SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
+                    sp.edit().putString("token", token).apply();
+                    Log.i("doInBackground", sp.getString("token", "NO_TOKEN_FOUND"));
+                } else {
+                    result = false;
+                    Log.i("doInBackground", conn.getResponseMessage());
                 }
+
+            } catch (Exception e) {
+                result = false;
             }
 
-            // TODO: register the new account here.
-            return true;
+            return result;
         }
 
         @Override

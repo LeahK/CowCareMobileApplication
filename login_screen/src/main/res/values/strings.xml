@@ -13,4 +13,6 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="mock_server">http://private-a59ad-katyscareapi.apiary-mock.com</string>
+
 </resources>
