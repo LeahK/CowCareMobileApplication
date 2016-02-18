@@ -34,6 +34,8 @@ import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
+import org.json.JSONObject;
+
 /**
  * A login screen that offers login via email/password.
  */
@@ -310,8 +312,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             try {
                 // Simulate network access.
-                Thread.sleep(2000);
+                //Thread.sleep(2000);
+
+                //
+                JSONObject jsonObj = new JSONObject();
+
+                jsonObj.put("username", mEmail);
+                jsonObj.put("password", mPassword);
+
+
+                // Create the POST object and add the parameters
+
+                HttpPost httpPost = new HttpPost(url);
+
+                StringEntity entity = new StringEntity(jsonObj.toString(), HTTP.UTF_8);
+                //
+
             } catch (InterruptedException e) {
+                return false;
+            } catch (org.json.JSONException e){
                 return false;
             }
 
