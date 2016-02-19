@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TabHost;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -22,6 +23,27 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // tabHost is setup here
+        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
+        tabHost.setup();
+        // now create a tab to the tab host
+        TabHost.TabSpec tabSpec = tabHost.newTabSpec("TODO");
+        // what's the content of this tab?
+        tabSpec.setContent(R.id.tabTodo);
+        // what's the text of the tab?
+        tabSpec.setIndicator("TODO");
+        // okay, now add the tab.
+        tabHost.addTab (tabSpec);
+
+        // repeat for additional tab
+        tabSpec = tabHost.newTabSpec("WAITING");
+        // what's the content of this tab?
+        tabSpec.setContent(R.id.tabWaiting);
+        // what's the text of the tab?
+        tabSpec.setIndicator("WAITING");
+        // okay, now add the tab.
+        tabHost.addTab (tabSpec);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
