@@ -3,6 +3,7 @@ package com.example.leah.myapplication;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,10 +13,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    // some variables for TabHost view
+    ArrayList<Cow> todoCows = new ArrayList<Cow>();
+    ArrayList<Cow> waitingCows = new ArrayList<Cow>();
+
+    // some variables for the TabHost listviews
+    ListView listViewTodoCows;
+    ListView listViewWaitingCows;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,9 +40,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // set up the list views
+        listViewTodoCows = (ListView) findViewById(R.id.listTodo);
+        listViewWaitingCows = (ListView) findViewById(R.id.listWaiting);
+
         // tabHost is setup here
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
+
         // now create a tab to the tab host
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("TODO");
         // what's the content of this tab?
@@ -34,7 +55,23 @@ public class MainActivity extends AppCompatActivity
         // what's the text of the tab?
         tabSpec.setIndicator("TODO");
         // okay, now add the tab.
-        tabHost.addTab (tabSpec);
+        tabHost.addTab(tabSpec);
+
+        // @TODO --> replace this once we get working with API/SERVER
+
+        addTodoCow(123L, true, false);
+
+        // every time the data set is changed, you have to notify the adapter
+        //listTodoAdapter.notifyDataSetChanged();
+
+        populateTodoList();
+
+        addWaitingCow(456L, false, true);
+
+        // every time the data set is changed, you have to notify the adapter
+        // listWaitingAdapter.notifyDataSetChanged();
+
+        populateWaitingList();
 
         // repeat for additional tab
         tabSpec = tabHost.newTabSpec("WAITING");
@@ -63,6 +100,95 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
+
+    // some methods
+
+    // @TODO --> this will need to work with API to grab the list of cows and then filter
+    // @TODO --> ... based on whether they belong in "todo" list or not
+
+    private void addTodoCow(long cowID, boolean isTodo, boolean isWaiting){
+        // note that Boolean isTodo will ALWAYS be true here and isWaiting will ALWAYS be false
+        todoCows.add(new Cow(cowID, isTodo, isWaiting));
+    }
+
+    private void populateTodoList(){
+        ArrayAdapter<Cow> adapter = new listTodoAdapter();
+        listViewTodoCows.setAdapter(adapter);
+    }
+
+
+    private class listTodoAdapter extends ArrayAdapter<Cow> {
+        // constructor
+        public listTodoAdapter(){
+            super (MainActivity.this, R.layout.listview_todocow, todoCows);
+        }
+
+        // create a method that will fill our view with all the array elements
+        @Override
+        public View getView(int position, View view, ViewGroup parent){
+            if (view == null)
+            {
+                view = getLayoutInflater().inflate(R.layout.listview_todocow, parent, false);
+            }
+
+            Cow currentCow = todoCows.get(position);
+
+            // create a text view
+            TextView todoCowID = (TextView) view.findViewById(R.id.todoCowID);
+
+            // set the text in the text view
+            long cowID = currentCow.getCowID();
+            String cowID_text = String.valueOf(cowID);
+            todoCowID.setText(cowID_text);
+
+            // when done setting all the text and shtuff
+            // return the view
+            return view;
+
+        }
+    }
+
+    private void addWaitingCow(long cowID, boolean isTodo, boolean isWaiting){
+        // note that Boolean isTodo will ALWAYS be true here and isWaiting will ALWAYS be false
+        waitingCows.add(new Cow(cowID, isTodo, isWaiting));
+    }
+
+    private void populateWaitingList(){
+        ArrayAdapter<Cow> adapter = new listWaitingAdapter();
+        listViewWaitingCows.setAdapter(adapter);
+    }
+
+    private class listWaitingAdapter extends ArrayAdapter<Cow> {
+        // constructor
+        public listWaitingAdapter(){
+            super (MainActivity.this, R.layout.listview_waitingcow, waitingCows);
+        }
+
+        // create a method that will fill our view with all the array elements
+        @Override
+        public View getView(int position, View view, ViewGroup parent){
+            if (view == null)
+            {
+                view = getLayoutInflater().inflate(R.layout.listview_waitingcow, parent, false);
+            }
+
+            Cow currentCow = waitingCows.get(position);
+
+            // create a text view
+            TextView waitingCowID = (TextView) view.findViewById(R.id.waitingCowID);
+
+            // set the text in the text view
+            long cowID = currentCow.getCowID();
+            String cowID_text = String.valueOf(cowID);
+            waitingCowID.setText(cowID_text);
+
+            // when done setting all the text and shtuff
+            // return the view
+            return view;
+
+        }
+    }
+
 
     @Override
     public void onBackPressed() {
