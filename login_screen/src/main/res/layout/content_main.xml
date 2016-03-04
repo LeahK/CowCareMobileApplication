@@ -19,6 +19,7 @@
         android:id="@+id/addNewCow"
         android:layout_marginTop="500dp" />
 
+
     <TabHost
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -54,6 +55,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/listTodo" />
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="fake cow: 12345678"
+                        android:id="@+id/fakeCow1"/>
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -66,6 +74,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/listWaiting" />
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="fake cow: 87654321"
+                        android:id="@+id/fakeCow2"/>
                 </LinearLayout>
 
             </FrameLayout>

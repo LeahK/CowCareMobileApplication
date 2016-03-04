@@ -61,14 +61,14 @@ public class MainActivity extends AppCompatActivity
 
         // @TODO --> replace this once we get working with API/SERVER
 
-        addTodoCow(123L, true, false);
+        //addTodoCow(123L, true, false);
 
         // every time the data set is changed, you have to notify the adapter
         //listTodoAdapter.notifyDataSetChanged();
 
         populateTodoList();
 
-        addWaitingCow(456L, false, true);
+        //addWaitingCow(456L, false, true);
 
         // every time the data set is changed, you have to notify the adapter
         // listWaitingAdapter.notifyDataSetChanged();
@@ -89,6 +89,22 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this, AddNewCow.class));
+            }
+        });
+
+        Button cowInfoButton1 = (Button) findViewById(R.id.fakeCow1);
+        cowInfoButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, CowInformation.class));
+            }
+        });
+
+        Button cowInfoButton2 = (Button) findViewById(R.id.fakeCow2);
+        cowInfoButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, CowInformation.class));
             }
         });
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Dairy</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -22,6 +22,12 @@
     <string name="add_new_cow">Add New Cow</string>
     <string name="cow_id">Finish Enter</string>
     <string name="enter_cow_id">Enter Cow ID</string>
+
+    <string name="mus">Moribund or unfit for slaughter</string>
+    <string name="sto">Separated for treatment or observation</string>
+    <string name="nmb">No medications on board, fit for transport</string>
+    <string name="ut">Unfit for transport</string>
+    <string name="title_activity_cow_information">CowInformation</string>
 
 
 </resources>
