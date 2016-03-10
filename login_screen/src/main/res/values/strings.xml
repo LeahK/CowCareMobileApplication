@@ -28,6 +28,8 @@
     <string name="nmb">No medications on board, fit for transport</string>
     <string name="ut">Unfit for transport</string>
     <string name="title_activity_cow_information">CowInformation</string>
+    <string name="step1">No response to the treatment, condition declining</string>
+    <string name="step2">Positive response to th etreatment, condition improved</string>
 
 
 </resources>

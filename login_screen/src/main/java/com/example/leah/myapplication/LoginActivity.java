@@ -208,7 +208,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 2;
+        return password.length() > 4;
     }
 
     /**
@@ -309,8 +309,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
-        String request  = "http://katys-care-api.herokuapp.com/v1/token?include=users";
-
+        String request  = "http://private-a59ad-katyscareapi.apiary-mock.com/tokens?include=users";
+        //String request  = "http://katys-care-api.herokuapp.com/v1/calves/token?include=users";
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
@@ -364,7 +364,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 wr.flush();
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
-                    //Log.i("doInBackground", "WE ARE HERE");
                     JSONObject resp = new JSONObject(getHttpResponse(conn));
                     JSONObject data = resp.getJSONObject("data");
                     String token = data.getString("id");
@@ -372,7 +371,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     sp.edit().putString("token", token).apply();  //adds token to shared preferences
                     Log.i("doInBackground", sp.getString("token", "NO_TOKEN_FOUND"));
                 } else {
-
                     result = false;
                     Log.i("doInBackground", conn.getResponseMessage());
                 }

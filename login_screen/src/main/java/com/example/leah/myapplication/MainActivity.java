@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity
         // what's the text of the tab?
         tabSpec.setIndicator("WAITING");
         // okay, now add the tab.
-        tabHost.addTab (tabSpec);
+        tabHost.addTab(tabSpec);
 
         Button addNewCowButton = (Button) findViewById(R.id.addNewCow);
         addNewCowButton.setOnClickListener(new View.OnClickListener() {
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity
         cowInfoButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, CowInformation.class));
+                startActivity(new Intent(MainActivity.this, NextStep.class));
             }
         });
 
