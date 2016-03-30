@@ -309,8 +309,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
-        String request  = "http://private-a59ad-katyscareapi.apiary-mock.com/tokens?include=users";
-        //String request  = "http://katys-care-api.herokuapp.com/v1/calves/token?include=users";
+        //String request  = "http://private-a59ad-katyscareapi.apiary-mock.com/tokens?include=users";
+        String request  = "http://katys-care-api.herokuapp.com/v1/token?include=users";
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
@@ -355,15 +355,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 conn.setDoOutput(true);
                 conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod("POST");
-                conn.setRequestProperty("Accepts", "application/json");
+                conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("charset", "utf-8");
+                conn.setRequestProperty("content-Length", Integer.toString(postData.length()));
+
                 conn.setUseCaches(false);
 
-                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-                wr.write(postData);
-                wr.flush();
+                //try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())){
+                   // wr.write(postData);
 
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED) {
+                //}
+                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+                wr.write(postData);
+                wr.close();
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     JSONObject resp = new JSONObject(getHttpResponse(conn));
                     JSONObject data = resp.getJSONObject("data");
                     String token = data.getString("id");
@@ -402,6 +409,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
         }
+
+
+
     }
+
+
+
 }
 

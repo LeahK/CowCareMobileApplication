@@ -1,6 +1,9 @@
 package com.example.leah.myapplication;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,6 +24,12 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -262,5 +271,47 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    public class getCowTask extends AsyncTask<Void, Void, Boolean>{
+
+        SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
+        String token = sp.getString("token", "NO_TOKEN_FOUND");
+
+        String request  = "http://private-a59ad-katyscareapi.apiary-mock.com/calves?include=treatment_plan";
+
+
+        protected Boolean doInBackground(Void... params) {
+            Boolean result = true;
+
+            try {
+                URL url = new URL(request);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                conn.setInstanceFollowRedirects(false);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", token);
+                conn.setRequestProperty("charset", "utf-8");
+                conn.setUseCaches(false);
+                
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+
+                    Log.i("success",conn.getResponseMessage());
+
+                } else {
+                    result = false;
+                    Log.i("doInBackground", conn.getResponseMessage());
+                }
+
+            } catch (Exception e) {
+                result = false;
+            }
+
+            return result;
+        }
+
+
     }
 }

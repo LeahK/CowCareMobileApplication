@@ -10,4 +10,6 @@ public class CowInformation extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cow_information);
     }
+
+
 }
