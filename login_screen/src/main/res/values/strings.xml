@@ -8,6 +8,9 @@
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
+    <string name="error_invalid_cowID">This id is wrong</string>
+    <string name="error_incorrect_information">This information is incorrect</string>
+
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
@@ -22,11 +25,12 @@
     <string name="add_new_cow">Add New Cow</string>
     <string name="cow_id">Finish Enter</string>
     <string name="enter_cow_id">Enter Cow ID</string>
+    <string name="enter_state_number">Enter state number</string>
 
-    <string name="mus">Moribund or unfit for slaughter</string>
-    <string name="sto">Separated for treatment or observation</string>
-    <string name="nmb">No medications on board, fit for transport</string>
-    <string name="ut">Unfit for transport</string>
+    <string name="mus">a. Moribund or unfit for slaughter</string>
+    <string name="sto">b. Separated for treatment or observation</string>
+    <string name="nmb">c. No medications on board, fit for transport</string>
+    <string name="ut">d. Unfit for transport</string>
     <string name="title_activity_cow_information">CowInformation</string>
     <string name="step1">No response to the treatment, condition declining</string>
     <string name="step2">Positive response to th etreatment, condition improved</string>

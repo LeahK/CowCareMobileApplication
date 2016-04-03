@@ -294,10 +294,8 @@ public class MainActivity extends AppCompatActivity
                 conn.setRequestProperty("Authorization", token);
                 conn.setRequestProperty("charset", "utf-8");
                 conn.setUseCaches(false);
-                
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-
                     Log.i("success",conn.getResponseMessage());
 
                 } else {
