@@ -33,7 +33,8 @@
         <activity android:name=".AddNewCow" />
         <activity android:name=".CowInformation" />
         <activity android:name=".NextStep" />
-        <activity android:name=".TEMP"></activity>
+        <activity android:name=".TEMP" />
+        <activity android:name=".SignUp"></activity>
     </application>
 
 </manifest>

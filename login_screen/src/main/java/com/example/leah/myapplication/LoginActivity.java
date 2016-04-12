@@ -103,6 +103,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        //redirect to sign up page id "create new account button is clicked
+        Button signUpButton = (Button) findViewById(R.id.email_sign_up_button);
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(LoginActivity.this, SignUp.class));
+            }
+        });
     }
 
     private void populateAutoComplete() {
