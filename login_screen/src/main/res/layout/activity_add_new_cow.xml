@@ -31,7 +31,7 @@
             android:layout_below="@+id/cowID"
 
             android:hint="@string/enter_state_number"
-            android:inputType="number"
+            android:inputType="text"
             android:maxLines="1"
             android:singleLine="true" />
 

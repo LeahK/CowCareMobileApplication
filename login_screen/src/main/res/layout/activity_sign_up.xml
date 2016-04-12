@@ -13,7 +13,7 @@
         android:id="@+id/newEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="number"
+        android:inputType="textEmailAddress"
         android:hint="@string/enter_email"
         android:maxLines="1"
         android:singleLine="true" />
@@ -36,7 +36,7 @@
         android:layout_below="@+id/newFarmID"
 
         android:hint="@string/enter_password"
-        android:inputType="number"
+        android:inputType="textPassword"
         android:maxLines="1"
         android:singleLine="true" />
 
