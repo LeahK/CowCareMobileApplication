@@ -25,7 +25,7 @@
         android:layout_below="@+id/newEmail"
 
         android:hint="@string/enter_farmID"
-        android:inputType="number"
+        android:inputType="text"
         android:maxLines="1"
         android:singleLine="true" />
 

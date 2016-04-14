@@ -370,10 +370,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 conn.setUseCaches(false);
 
-                //try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())){
-                   // wr.write(postData);
 
-                //}
                 OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 
                 wr.write(postData);

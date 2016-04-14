@@ -80,11 +80,12 @@ public class AddNewCow extends AppCompatActivity {
 
         // Reset errors.
         mCowIDView.setError(null);
+        mStateView.setError(null);
 
         // Store values at the time of the add attempt.
         String cowID = mCowIDView.getText().toString();
         String state = mStateView.getText().toString();
-        String farmID = "123456";
+        String farmID = "cw53n";
         boolean cancel = false;
         View focusView = null;
 
@@ -98,12 +99,11 @@ public class AddNewCow extends AppCompatActivity {
 
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
+
             focusView.requestFocus();
         } else {
-            // perform the user login attempt.
-            mNewCowTask = new AddNewCowTask(cowID, state,farmID);
+            // perform the new user attempt.
+            mNewCowTask = new AddNewCowTask(cowID, state, farmID);
             mNewCowTask.execute((Void) null);
         }
     }
@@ -115,7 +115,6 @@ public class AddNewCow extends AppCompatActivity {
         private final String mCowID;
         private final String mState;
         private final String mFarmID;
-        //String request  = "http://private-a59ad-katyscareapi.apiary-mock.com/tokens?include=users";
         String request  = "http://polls.apiblueprint.org/calves?include=farm,treatment_plan";
         AddNewCowTask(String cowID, String state, String farmID) {
             mCowID = cowID;
@@ -150,6 +149,7 @@ public class AddNewCow extends AppCompatActivity {
                 data.put("type", typeCow);
                 data.put("attributes", attributes);
                 data.put("relationships", relationship);
+                postData.put("data",data);
 
             } catch (JSONException e){
                 Log.i("makeRequestJSON", "Impossible Error");
@@ -188,8 +188,8 @@ public class AddNewCow extends AppCompatActivity {
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("charset", "utf-8");
                 conn.setRequestProperty("content-Length", Integer.toString(postData.length()));
-
                 conn.setUseCaches(false);
+
 
                 //try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())){
                 // wr.write(postData);

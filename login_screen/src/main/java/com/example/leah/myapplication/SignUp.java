@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,6 +25,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SignUp extends AppCompatActivity {
 
@@ -67,7 +70,7 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 attemptAddNewUser();
-                startActivity(new Intent(SignUp.this, MainActivity.class));
+
             }
         });
 
@@ -88,24 +91,28 @@ public class SignUp extends AppCompatActivity {
         // Store values at the time of the add attempt.
         String email = mEmailView.getText().toString();
         String farmID = mFarmIDView.getText().toString();
-        String password = mPasswordView.getText().toString();;
+        String password = mPasswordView.getText().toString();
+        Log.i("email", email);
+        Log.i("farmID", farmID);
+        Log.i("password", password);
+
         boolean cancel = false;
         View focusView = null;
 
         // Check for a valid email, if the user entered one.
-        if (!TextUtils.isEmpty(email)) {
+        if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
         }
         // Check for a valid farmID, if the user entered one.
-        if (!TextUtils.isEmpty(farmID)) {
+        if (TextUtils.isEmpty(farmID)) {
             mFarmIDView.setError(getString(R.string.error_invalid_farmID));
             focusView = mFarmIDView;
             cancel = true;
         }
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(email)) {
+        if (TextUtils.isEmpty(email)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -114,13 +121,20 @@ public class SignUp extends AppCompatActivity {
 
 
         if (cancel) {
+            Log.i("executed", "no");
+
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
         } else {
             // perform the user login attempt.
+            Log.i("executed", "yes");
             mNewUserTask = new NewUserTask(email, farmID,password);
+            Log.i("executed", "created");
+
             mNewUserTask.execute((Void) null);
+            Log.i("executed", "done");
+
         }
     }
 
@@ -130,7 +144,7 @@ public class SignUp extends AppCompatActivity {
         private final String mFarmID;
         private final String mPassword;
         //String request  = "http://private-a59ad-katyscareapi.apiary-mock.com/tokens?include=users";
-        String request  = "http://private-anon-e20dc275e-katyscareapi.apiary-proxy.com/users&offset=offset&limit=limit&include=farm";
+        String request  = "http://katys-care-api.herokuapp.com/v1/users";
         NewUserTask(String email, String farmID, String password) {
             mEmail = email;
             mFarmID = farmID;
@@ -139,33 +153,38 @@ public class SignUp extends AppCompatActivity {
 
         protected String makeNewUserRequest(){
             JSONObject postData = new JSONObject();
+
             JSONObject data = new JSONObject();
             JSONObject attributes = new JSONObject();
             JSONObject relationship = new JSONObject();
             JSONObject farm = new JSONObject();
-            JSONObject farmData = new JSONObject();
-            String userType = "app_users";
+            JSONArray farmData = new JSONArray();
+            JSONObject farmData1 = new JSONObject();
             String typeFarm = "farms";
             String type = "users";
 
-
-
             try {
-                attributes.put("username", mEmail);
-                attributes.put("type", userType);
+                attributes.put("type", type);
+                attributes.put("email", mEmail);
+                attributes.put("password", mPassword);
 
-                farmData.put("type", typeFarm);
-                farmData.put("id", mFarmID);
+
+                farmData1.put("type", typeFarm);
+                farmData1.put("id", mFarmID);
+                farmData.put(farmData1);
                 farm.put("data", farmData);
 
-                relationship.put("farm", farm);
+                relationship.put("works_for", farm);
+
                 data.put("type", type);
                 data.put("attributes", attributes);
                 data.put("relationships", relationship);
 
+                postData.put("data",data);
             } catch (JSONException e){
                 Log.i("makeRequestJSON", "Impossible Error");
             }
+            Log.i("postData",postData.toString() );
             return postData.toString();
         }
 
@@ -189,6 +208,7 @@ public class SignUp extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             Boolean result = true;
+            Log.i("do in background", "yep, I get called");
 
             try {
                 String postData = makeNewUserRequest();
@@ -203,10 +223,7 @@ public class SignUp extends AppCompatActivity {
 
                 conn.setUseCaches(false);
 
-                //try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())){
-                // wr.write(postData);
 
-                //}
                 OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 
                 wr.write(postData);
@@ -214,11 +231,9 @@ public class SignUp extends AppCompatActivity {
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     JSONObject resp = new JSONObject(getHttpResponse(conn));
-                    JSONObject data = resp.getJSONObject("data");
-                    String token = data.getString("id");
-                    SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
-                    sp.edit().putString("token", token).apply();  //adds token to shared preferences
-                    Log.i("doInBackground", sp.getString("token", "NO_TOKEN_FOUND"));
+                    //JSONObject data = resp.getJSONObject("data");
+                    //JSONObject attr = resp.getJSONObject("attributes");
+                    Log.i("response", "looks good");
                 } else {
                     result = false;
                     Log.i("doInBackground", conn.getResponseMessage());
@@ -238,7 +253,7 @@ public class SignUp extends AppCompatActivity {
             if (success) {
                 // finish();
                 // on success, we want to redirect to main activity
-                startActivity(new Intent(SignUp.this, MainActivity.class));
+                startActivity(new Intent(SignUp.this, LoginActivity.class));
             } else {
                 mEmailView.setError(getString(R.string.error_incorrect_information));
                 mEmailView.requestFocus();
