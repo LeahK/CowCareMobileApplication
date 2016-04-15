@@ -27,6 +27,8 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     // some variables for TabHost view
     ArrayList<Cow> todoCows = new ArrayList<Cow>();
     ArrayList<Cow> waitingCows = new ArrayList<Cow>();
+    private GetCowTask mGetCowTask = null;
 
     // some variables for the TabHost listviews
     ListView listViewTodoCows;
@@ -53,6 +56,10 @@ public class MainActivity extends AppCompatActivity
 
         // set up the list views
         listViewTodoCows = (ListView) findViewById(R.id.listTodo);
+
+
+
+
         listViewWaitingCows = (ListView) findViewById(R.id.listWaiting);
 
         // tabHost is setup here
@@ -63,14 +70,21 @@ public class MainActivity extends AppCompatActivity
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("TODO");
         // what's the content of this tab?
         tabSpec.setContent(R.id.tabTodo);
+
         // what's the text of the tab?
         tabSpec.setIndicator("TODO");
+
         // okay, now add the tab.
         tabHost.addTab(tabSpec);
 
+
         // @TODO --> replace this once we get working with API/SERVER
 
-        //addTodoCow(123L, true, false);
+        addTodoCow(123L, true, false);
+        mGetCowTask = new GetCowTask();
+        mGetCowTask.execute((Void) null);
+
+
 
         // every time the data set is changed, you have to notify the adapter
         //listTodoAdapter.notifyDataSetChanged();
@@ -93,6 +107,8 @@ public class MainActivity extends AppCompatActivity
         // okay, now add the tab.
         tabHost.addTab(tabSpec);
 
+
+
         Button addNewCowButton = (Button) findViewById(R.id.addNewCow);
         addNewCowButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,21 +117,9 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        Button cowInfoButton1 = (Button) findViewById(R.id.fakeCow1);
-        cowInfoButton1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, NextStep.class));
-            }
-        });
 
-        Button cowInfoButton2 = (Button) findViewById(R.id.fakeCow2);
-        cowInfoButton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, CowInformation.class));
-            }
-        });
+
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -274,13 +278,34 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public class getCowTask extends AsyncTask<Void, Void, Boolean>{
+    public class GetCowTask extends AsyncTask<Void, Void, Boolean>{
 
         SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
         String token = sp.getString("token", "NO_TOKEN_FOUND");
 
-        String request  = "http://private-a59ad-katyscareapi.apiary-mock.com/calves?include=treatment_plan";
+        String farmID = sp.getString("farmID", "NO_TOKEN_FOUND");
+        String request  = "http://katys-care-api.herokuapp.com/v1/farms/"+ farmID +"?include=calves.treatment_plan";
 
+        GetCowTask(){
+
+        }
+
+        protected String getHttpResponse(HttpURLConnection conn) {
+            String response = "";
+            StringBuilder sb = new StringBuilder();
+            try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line.concat("\n"));
+                }
+                br.close();
+                response = sb.toString();
+            } catch (Exception e){
+                Log.i("getHttpResponse", "Impossible Error");
+            }
+            return response;
+        }
 
         protected Boolean doInBackground(Void... params) {
             Boolean result = true;
@@ -298,6 +323,9 @@ public class MainActivity extends AppCompatActivity
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     Log.i("success",conn.getResponseMessage());
 
+                    JSONObject resp = new JSONObject(getHttpResponse(conn));
+                    Log.i("getCow response", resp.toString());
+
                 } else {
                     result = false;
                     Log.i("doInBackground", conn.getResponseMessage());
@@ -309,6 +337,25 @@ public class MainActivity extends AppCompatActivity
 
             return result;
         }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mGetCowTask = null;
+
+            if (success) {
+                // finish();
+                // on success, we want to redirect to main activity
+                Log.i("psotExecuted", "successed");
+            } else {
+                Log.i("psotExecuted", "Not successed");
+
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mGetCowTask = null;
+        }
+
 
 
     }
