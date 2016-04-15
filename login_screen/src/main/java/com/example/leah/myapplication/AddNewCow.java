@@ -145,7 +145,7 @@ public class AddNewCow extends AppCompatActivity {
         private final String mState;
         private final String mFarmID;
         private final String mCowName;
-        String request  = "http://polls.apiblueprint.org/calves?include=farm,treatment_plan";
+        String request  = "http://katys-care-api.herokuapp.com/v1/calves";
         AddNewCowTask(String cowID, String state, String farmID,String cowName) {
             mCowID = cowID;
             mState = state;
@@ -215,6 +215,8 @@ public class AddNewCow extends AppCompatActivity {
         protected Boolean doInBackground(Void... params) {
             Boolean result = true;
             Log.i("do in background", "yep, I get called");
+            SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
+            String token = sp.getString("token","NO farm found");
 
             try {
                 String postData = makeAddNewCowRequest();
@@ -224,6 +226,7 @@ public class AddNewCow extends AppCompatActivity {
                 conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("Authorization", token);
                 conn.setRequestProperty("charset", "utf-8");
                 conn.setRequestProperty("content-Length", Integer.toString(postData.length()));
                 conn.setUseCaches(false);
