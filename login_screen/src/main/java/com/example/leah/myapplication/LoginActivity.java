@@ -42,6 +42,7 @@ import android.util.*;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -319,7 +320,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private final String mEmail;
         private final String mPassword;
         //String request  = "http://private-a59ad-katyscareapi.apiary-mock.com/tokens?include=users";
-        String request  = "http://katys-care-api.herokuapp.com/v1/token?include=users";
+        String request  = "http://katys-care-api.herokuapp.com/v1/token?include=user";
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
@@ -380,9 +381,27 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     JSONObject resp = new JSONObject(getHttpResponse(conn));
                     JSONObject data = resp.getJSONObject("data");
                     String token = data.getString("id");
+                    //test
+                    JSONArray farmData = resp.getJSONArray("included");
+                    JSONObject farmData1 = farmData.getJSONObject(0);
+                    JSONObject farmAttr = farmData1.getJSONObject("attributes");
+
+                    String farmID = farmAttr.get("farm_ids").toString().substring(2,7);
+
+                    Log.i("farmID", farmID);
+
+
+                    Log.i("res", resp.toString());
+                    //test
+
+
                     SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
                     sp.edit().putString("token", token).apply();  //adds token to shared preferences
-                    Log.i("doInBackground", sp.getString("token", "NO_TOKEN_FOUND"));
+                    sp.edit().putString("farmID",farmID).apply();//add farmID to sp
+                    Log.i("doInBackground1", sp.getString("token", "NO_TOKEN_FOUND"));
+                    Log.i("doInBackground2", sp.getString("farmID", "NO_FARM_FOUND"));
+
+
                 } else {
                     result = false;
                     Log.i("doInBackground", conn.getResponseMessage());
@@ -423,4 +442,3 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
 }
-

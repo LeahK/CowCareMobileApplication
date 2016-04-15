@@ -121,7 +121,7 @@ public class SignUp extends AppCompatActivity {
 
 
         if (cancel) {
-            Log.i("executed", "no");
+
 
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -230,7 +230,7 @@ public class SignUp extends AppCompatActivity {
                 wr.close();
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    JSONObject resp = new JSONObject(getHttpResponse(conn));
+                    //JSONObject resp = new JSONObject(getHttpResponse(conn));
                     //JSONObject data = resp.getJSONObject("data");
                     //JSONObject attr = resp.getJSONObject("attributes");
                     Log.i("response", "looks good");

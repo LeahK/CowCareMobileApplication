@@ -33,6 +33,7 @@
     <string name="enter_farmID">Enter farm ID</string>
     <string name="enter_password">Enter password</string>
 
+    <string name="enter_cow_name">Enter Cow Name</string>
 
     <string name="mus">a. Moribund or unfit for slaughter</string>
     <string name="sto">b. Separated for treatment or observation</string>

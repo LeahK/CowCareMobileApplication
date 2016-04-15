@@ -37,6 +37,7 @@ public class AddNewCow extends AppCompatActivity {
 
     private AutoCompleteTextView mCowIDView;
     private EditText mStateView;
+    private EditText mCowNameView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,16 @@ public class AddNewCow extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.state || id == EditorInfo.IME_NULL) {
+                    return true;
+                }
+                return false;
+            }
+        });
+        mCowNameView = (EditText) findViewById(R.id.cowName);
+        mCowNameView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == R.id.cowName || id == EditorInfo.IME_NULL) {
                     return true;
                 }
                 return false;
@@ -81,16 +92,25 @@ public class AddNewCow extends AppCompatActivity {
         // Reset errors.
         mCowIDView.setError(null);
         mStateView.setError(null);
+        mCowNameView.setError(null);
+
+
+        SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
 
         // Store values at the time of the add attempt.
         String cowID = mCowIDView.getText().toString();
         String state = mStateView.getText().toString();
-        String farmID = "cw53n";
+        String cowName = mCowNameView.getText().toString();
+        Log.i("cowID", cowID);
+        Log.i("state", state);
+        Log.i("cowName", cowName);
+
+        String farmID = sp.getString("farmID","NO farm found");
         boolean cancel = false;
         View focusView = null;
 
         // Check for a valid cowID, if the user entered one.
-        if (!TextUtils.isEmpty(cowID)) {
+        if (TextUtils.isEmpty(cowID)) {
             mCowIDView.setError(getString(R.string.error_invalid_cowID));
             focusView = mCowIDView;
             cancel = true;
@@ -98,13 +118,22 @@ public class AddNewCow extends AppCompatActivity {
 
 
 
+
         if (cancel) {
 
+            Log.i("executed", "no");
             focusView.requestFocus();
+
         } else {
             // perform the new user attempt.
-            mNewCowTask = new AddNewCowTask(cowID, state, farmID);
+            Log.i("executed", "yes");
+
+            mNewCowTask = new AddNewCowTask(cowID, state, farmID,cowName);
+            Log.i("executed", "created");
+
             mNewCowTask.execute((Void) null);
+            Log.i("executed", "done");
+
         }
     }
 
@@ -115,41 +144,49 @@ public class AddNewCow extends AppCompatActivity {
         private final String mCowID;
         private final String mState;
         private final String mFarmID;
+        private final String mCowName;
         String request  = "http://polls.apiblueprint.org/calves?include=farm,treatment_plan";
-        AddNewCowTask(String cowID, String state, String farmID) {
+        AddNewCowTask(String cowID, String state, String farmID,String cowName) {
             mCowID = cowID;
             mState = state;
             mFarmID = farmID;
+            mCowName = cowName;
         }
 
-        protected String makeAddNewCownRequest(){
+        protected String makeAddNewCowRequest(){
             JSONObject postData = new JSONObject();
+
             JSONObject data = new JSONObject();
             String typeCow = "calves";
             String typeFarm = "farms";
-            String typeTreatment = "treatment_plans";
+            //String typeTreatment = "treatment_plans";
             JSONObject attributes = new JSONObject();
             JSONObject relationship = new JSONObject();
             JSONObject farm = new JSONObject();
             JSONObject farmData = new JSONObject();
-            JSONObject treatment_plan = new JSONObject();
-            JSONObject treatment_Data = new JSONObject();
+            //JSONObject treatment_plan = new JSONObject();
+            //JSONObject treatment_Data = new JSONObject();
 
             try {
-                attributes.put("id", mCowID);
-                attributes.put("type", typeCow);
+                attributes.put("cid", mCowID);
+                attributes.put("name", mCowName);
+
                 farmData.put("type", typeFarm);
                 farmData.put("id", mFarmID);
+
                 farm.put("data", farmData);
-                treatment_Data.put("type", typeTreatment);
-                treatment_Data.put("id", mState);
-                treatment_plan.put("data", treatment_Data);
+
+                //treatment_Data.put("type", typeTreatment);
+                //treatment_Data.put("id", mState);
+                //treatment_plan.put("data", treatment_Data);
                 relationship.put("farm", farm);
-                relationship.put("treatment_plan", treatment_plan);
+                //relationship.put("treatment_plan", treatment_plan);
                 data.put("type", typeCow);
                 data.put("attributes", attributes);
                 data.put("relationships", relationship);
                 postData.put("data",data);
+
+                Log.i("postData", postData.toString());
 
             } catch (JSONException e){
                 Log.i("makeRequestJSON", "Impossible Error");
@@ -177,9 +214,10 @@ public class AddNewCow extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             Boolean result = true;
+            Log.i("do in background", "yep, I get called");
 
             try {
-                String postData = makeAddNewCownRequest();
+                String postData = makeAddNewCowRequest();
                 URL url = new URL(request);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setDoOutput(true);
@@ -190,23 +228,14 @@ public class AddNewCow extends AppCompatActivity {
                 conn.setRequestProperty("content-Length", Integer.toString(postData.length()));
                 conn.setUseCaches(false);
 
-
-                //try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())){
-                // wr.write(postData);
-
-                //}
                 OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 
                 wr.write(postData);
                 wr.close();
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    JSONObject resp = new JSONObject(getHttpResponse(conn));
-                    JSONObject data = resp.getJSONObject("data");
-                    String token = data.getString("id");
-                    SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
-                    sp.edit().putString("token", token).apply();  //adds token to shared preferences
-                    Log.i("doInBackground", sp.getString("token", "NO_TOKEN_FOUND"));
+
+                    Log.i("doInBackground", "added");
                 } else {
                     result = false;
                     Log.i("doInBackground", conn.getResponseMessage());
