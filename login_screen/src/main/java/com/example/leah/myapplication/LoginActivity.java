@@ -320,7 +320,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private final String mEmail;
         private final String mPassword;
         //String request  = "http://private-a59ad-katyscareapi.apiary-mock.com/tokens?include=users";
-        String request  = "http://katys-care-api.herokuapp.com/v1/token?include=user";
+        String request  = "http://katys-care-api.herokuapp.com/v1/token?include=user.works_for";
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
@@ -382,24 +382,33 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     JSONObject data = resp.getJSONObject("data");
                     String token = data.getString("id");
                     //test
-                    JSONArray farmData = resp.getJSONArray("included");
-                    JSONObject farmData1 = farmData.getJSONObject(0);
-                    JSONObject farmAttr = farmData1.getJSONObject("attributes");
+                    JSONArray includedData = resp.getJSONArray("included");
+                    JSONObject includedData1 = includedData.getJSONObject(0);
+                    JSONObject relationship = includedData1.getJSONObject("relationships");
+                    JSONObject worksFor = relationship.getJSONObject("works_for");
+                    JSONArray finalDataArray = worksFor.getJSONArray("data");
+                    JSONObject finalData = finalDataArray.getJSONObject(0);
+                    String farmID = finalData.getString("id");
 
-                    String farmID = farmAttr.get("farm_ids").toString().substring(2,7);
 
-                    Log.i("farmID", farmID);
+                    //get treatment plan
+                    JSONObject includedData2 = includedData.getJSONObject(1);
+
+                    String treatmentPlan = includedData2.getJSONObject("attributes").getString("default_treatment_plan");
 
 
-                    Log.i("res", resp.toString());
+
                     //test
 
 
                     SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
                     sp.edit().putString("token", token).apply();  //adds token to shared preferences
                     sp.edit().putString("farmID",farmID).apply();//add farmID to sp
+                    sp.edit().putString("treatmentID",treatmentPlan).apply();//add treatmentID to sp
+
                     Log.i("doInBackground1", sp.getString("token", "NO_TOKEN_FOUND"));
                     Log.i("doInBackground2", sp.getString("farmID", "NO_FARM_FOUND"));
+                    Log.i("doInBackground3", sp.getString("treatmentID", "NO_FARM_FOUND"));
 
 
                 } else {

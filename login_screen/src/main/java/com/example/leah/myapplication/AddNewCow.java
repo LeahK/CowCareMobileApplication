@@ -48,16 +48,7 @@ public class AddNewCow extends AppCompatActivity {
 
         mCowIDView = (AutoCompleteTextView) findViewById(R.id.cowID);
 
-        mStateView = (EditText) findViewById(R.id.state);
-        mStateView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.state || id == EditorInfo.IME_NULL) {
-                    return true;
-                }
-                return false;
-            }
-        });
+
         mCowNameView = (EditText) findViewById(R.id.cowName);
         mCowNameView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -74,7 +65,6 @@ public class AddNewCow extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 attemptAdd();
-                startActivity(new Intent(AddNewCow.this, MainActivity.class));
             }
         });
 
@@ -91,7 +81,6 @@ public class AddNewCow extends AppCompatActivity {
 
         // Reset errors.
         mCowIDView.setError(null);
-        mStateView.setError(null);
         mCowNameView.setError(null);
 
 
@@ -99,13 +88,12 @@ public class AddNewCow extends AppCompatActivity {
 
         // Store values at the time of the add attempt.
         String cowID = mCowIDView.getText().toString();
-        String state = mStateView.getText().toString();
         String cowName = mCowNameView.getText().toString();
         Log.i("cowID", cowID);
-        Log.i("state", state);
         Log.i("cowName", cowName);
 
         String farmID = sp.getString("farmID","NO farm found");
+        String treatmentID = sp.getString("treatmentID","NO farm found");
         boolean cancel = false;
         View focusView = null;
 
@@ -128,7 +116,7 @@ public class AddNewCow extends AppCompatActivity {
             // perform the new user attempt.
             Log.i("executed", "yes");
 
-            mNewCowTask = new AddNewCowTask(cowID, state, farmID,cowName);
+            mNewCowTask = new AddNewCowTask(cowID, farmID, cowName,treatmentID);
             Log.i("executed", "created");
 
             mNewCowTask.execute((Void) null);
@@ -142,15 +130,17 @@ public class AddNewCow extends AppCompatActivity {
     public class AddNewCowTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mCowID;
-        private final String mState;
         private final String mFarmID;
         private final String mCowName;
+        private final String mTP;
+
+
         String request  = "http://katys-care-api.herokuapp.com/v1/calves";
-        AddNewCowTask(String cowID, String state, String farmID,String cowName) {
+        AddNewCowTask(String cowID, String farmID,String cowName, String tP) {
             mCowID = cowID;
-            mState = state;
             mFarmID = farmID;
             mCowName = cowName;
+            mTP = tP;
         }
 
         protected String makeAddNewCowRequest(){
@@ -159,13 +149,13 @@ public class AddNewCow extends AppCompatActivity {
             JSONObject data = new JSONObject();
             String typeCow = "calves";
             String typeFarm = "farms";
-            //String typeTreatment = "treatment_plans";
+            String typeTreatment = "treatment_plans";
             JSONObject attributes = new JSONObject();
             JSONObject relationship = new JSONObject();
             JSONObject farm = new JSONObject();
             JSONObject farmData = new JSONObject();
-            //JSONObject treatment_plan = new JSONObject();
-            //JSONObject treatment_Data = new JSONObject();
+            JSONObject treatment_plan = new JSONObject();
+            JSONObject treatment_Data = new JSONObject();
 
             try {
                 attributes.put("cid", mCowID);
@@ -176,11 +166,11 @@ public class AddNewCow extends AppCompatActivity {
 
                 farm.put("data", farmData);
 
-                //treatment_Data.put("type", typeTreatment);
-                //treatment_Data.put("id", mState);
-                //treatment_plan.put("data", treatment_Data);
+                treatment_Data.put("type", typeTreatment);
+                treatment_Data.put("id", mTP);
+                treatment_plan.put("data", treatment_Data);
                 relationship.put("farm", farm);
-                //relationship.put("treatment_plan", treatment_plan);
+                relationship.put("treatment_plan", treatment_plan);
                 data.put("type", typeCow);
                 data.put("attributes", attributes);
                 data.put("relationships", relationship);
