@@ -123,6 +123,8 @@ public class MainActivity extends AppCompatActivity
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                todoCows = new ArrayList<Cow>();
+                waitingCows = new ArrayList<Cow>();
                 mGetCowTask = new GetCowTask();
                 mGetCowTask.execute((Void) null);
             }
@@ -344,7 +346,6 @@ public class MainActivity extends AppCompatActivity
                         Long cid = Long.valueOf(cowAttributes.getString("cid"));
 
                         addTodoCow(cid, true, false);
-
                         Log.i("Cow"+i, cid.toString());
 
                     }
