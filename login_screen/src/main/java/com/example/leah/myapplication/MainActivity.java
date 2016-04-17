@@ -24,6 +24,7 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -80,7 +81,8 @@ public class MainActivity extends AppCompatActivity
 
         // @TODO --> replace this once we get working with API/SERVER
 
-        addTodoCow(123L, true, false);
+        //addTodoCow(123L, true, false);
+
         mGetCowTask = new GetCowTask();
         mGetCowTask.execute((Void) null);
 
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity
 
         populateTodoList();
 
-        //addWaitingCow(456L, false, true);
+        addWaitingCow(456L, false, true);
 
         // every time the data set is changed, you have to notify the adapter
         // listWaitingAdapter.notifyDataSetChanged();
@@ -114,6 +116,15 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this, AddNewCow.class));
+            }
+        });
+
+        FloatingActionButton refreshButton = (FloatingActionButton) findViewById(R.id.refresh);
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mGetCowTask = new GetCowTask();
+                mGetCowTask.execute((Void) null);
             }
         });
 
@@ -324,7 +335,25 @@ public class MainActivity extends AppCompatActivity
                     Log.i("success",conn.getResponseMessage());
 
                     JSONObject resp = new JSONObject(getHttpResponse(conn));
-                    Log.i("getCow response", resp.toString());
+                    //test
+                    JSONArray includedArray = resp.getJSONArray("included");
+
+                    for(int i =1; i < includedArray.length(); i++){
+                        JSONObject cow = includedArray.getJSONObject(i);
+                        JSONObject cowAttributes = cow.getJSONObject("attributes");
+                        Long cid = Long.valueOf(cowAttributes.getString("cid"));
+
+                        addTodoCow(cid, true, false);
+
+                        Log.i("Cow"+i, cid.toString());
+
+                    }
+
+
+
+
+                    //test
+
 
                 } else {
                     result = false;
@@ -359,4 +388,5 @@ public class MainActivity extends AppCompatActivity
 
 
     }
+
 }
