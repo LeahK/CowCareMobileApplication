@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity
 
         // @TODO --> replace this once we get working with API/SERVER
 
-        //addTodoCow(123L, true, false);
+        addTodoCow(123L, true, false);
 
         mGetCowTask = new GetCowTask();
         mGetCowTask.execute((Void) null);
@@ -337,16 +337,28 @@ public class MainActivity extends AppCompatActivity
                     Log.i("success",conn.getResponseMessage());
 
                     JSONObject resp = new JSONObject(getHttpResponse(conn));
+                    Log.i("resp",resp.toString());
                     //test
                     JSONArray includedArray = resp.getJSONArray("included");
 
-                    for(int i =1; i < includedArray.length(); i++){
+                    for(int i =0; i < includedArray.length(); i++){
                         JSONObject cow = includedArray.getJSONObject(i);
-                        JSONObject cowAttributes = cow.getJSONObject("attributes");
-                        Long cid = Long.valueOf(cowAttributes.getString("cid"));
+                        if(cow.getString("type").equals("calves")){
+                            JSONObject cowAttributes = cow.getJSONObject("attributes");
+                            Long cid = Long.valueOf(cowAttributes.getString("cid"));
 
-                        addTodoCow(cid, true, false);
-                        Log.i("Cow"+i, cid.toString());
+                            //display cow into two lists
+                            if (cowAttributes.getBoolean("waiting") && (true)){
+                                addWaitingCow(cid, false, true);
+                                Log.i("Cow", cid.toString());
+                            }else{
+                                addTodoCow(cid, true, false);
+                                Log.i("Cow", cid.toString());
+
+                            }
+
+                        }
+
 
                     }
 
