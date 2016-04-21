@@ -227,6 +227,7 @@ public class MainActivity extends AppCompatActivity
 
             Cow currentCow = waitingCows.get(position);
 
+
             // create a text view
             TextView waitingCowID = (TextView) view.findViewById(R.id.waitingCowID);
 
