@@ -261,7 +261,6 @@ public class AddNewCow extends AppCompatActivity {
         }
 
 
-
     }
 
 

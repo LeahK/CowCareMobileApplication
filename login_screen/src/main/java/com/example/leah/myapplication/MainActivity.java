@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity
 
         // @TODO --> replace this once we get working with API/SERVER
 
-        addTodoCow(123L, true, false);
+//        addTodoCow(123L, true, false);
 
         mGetCowTask = new GetCowTask();
         mGetCowTask.execute((Void) null);
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity
         //listTodoAdapter.notifyDataSetChanged();
 
         populateTodoList();
-        addWaitingCow(456L, false, true);
+//        addWaitingCow(456L, false, true);
 
         // every time the data set is changed, you have to notify the adapter
         // listWaitingAdapter.notifyDataSetChanged();
@@ -132,10 +132,6 @@ public class MainActivity extends AppCompatActivity
                 mGetCowTask.execute((Void) null);
             }
         });
-
-
-
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -187,6 +183,13 @@ public class MainActivity extends AppCompatActivity
             String cowID_text = String.valueOf(cowID);
             todoCowID.setText(cowID_text);
 
+            todoCowID.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(new Intent(MainActivity.this, NextStep.class));
+                }
+            });
+
             // when done setting all the text and shtuff
             // return the view
             return view;
@@ -227,6 +230,13 @@ public class MainActivity extends AppCompatActivity
             long cowID = currentCow.getCowID();
             String cowID_text = String.valueOf(cowID);
             waitingCowID.setText(cowID_text);
+
+            waitingCowID.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(new Intent(MainActivity.this, CowInformation.class));
+                }
+            });
 
             // when done setting all the text and shtuff
             // return the view
@@ -359,7 +369,6 @@ public class MainActivity extends AppCompatActivity
                             //Date date1 = sdf.parse(time);
                             //Date date2 = sdf.parse(currentDate);
                             if (cowAttributes.getBoolean("waiting")){
-                                if 
                                 addWaitingCow(cid, false, true);
                                 Log.i("Cow", cid.toString());
                             }else{
