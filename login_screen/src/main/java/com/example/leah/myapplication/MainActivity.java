@@ -133,6 +133,10 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
+
+
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -361,16 +365,28 @@ public class MainActivity extends AppCompatActivity
                             Log.i("cid",cid.toString());
 
                             //display cow into two lists
-                            //String time = cowAttributes.getString("wait_expires");
-                            //SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-                            //Date now = new Date();
-                            //String currentDate = sdf.format(now);
 
-                            //Date date1 = sdf.parse(time);
-                            //Date date2 = sdf.parse(currentDate);
                             if (cowAttributes.getBoolean("waiting")){
-                                addWaitingCow(cid, false, true);
-                                Log.i("Cow", cid.toString());
+                                if(cowAttributes.getString("wait_expires")!= null){
+                                    String time = cowAttributes.getString("wait_expires");
+                                    SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+                                    Date now = new Date();
+                                    String currentDate = sdf.format(now);
+
+                                    Date date1 = sdf.parse(time);
+                                    Date date2 = sdf.parse(currentDate);
+                                    if(date1.before(date2)){
+                                        addWaitingCow(cid, false, true);
+                                        Log.i("Cow", cid.toString());
+                                    }else{
+                                        addTodoCow(cid, true, false);
+                                        Log.i("Cow", cid.toString());
+                                    }
+                                }else{
+                                    addTodoCow(cid, true, false);
+                                    Log.i("Cow", cid.toString());
+                                }
+
                             }else{
                                 addTodoCow(cid, true, false);
                                 Log.i("Cow", cid.toString());
