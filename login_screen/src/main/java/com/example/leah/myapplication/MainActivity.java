@@ -368,26 +368,8 @@ public class MainActivity extends AppCompatActivity
                             //display cow into two lists
 
                             if (cowAttributes.getBoolean("waiting")){
-                                if(cowAttributes.getString("wait_expires")!= null){
-                                    String time = cowAttributes.getString("wait_expires");
-                                    SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-                                    Date now = new Date();
-                                    String currentDate = sdf.format(now);
-
-                                    Date date1 = sdf.parse(time);
-                                    Date date2 = sdf.parse(currentDate);
-                                    if(date1.before(date2)){
-                                        addWaitingCow(cid, false, true);
-                                        Log.i("Cow", cid.toString());
-                                    }else{
-                                        addTodoCow(cid, true, false);
-                                        Log.i("Cow", cid.toString());
-                                    }
-                                }else{
-                                    addTodoCow(cid, true, false);
-                                    Log.i("Cow", cid.toString());
-                                }
-
+                                addWaitingCow(cid,false,true);
+                                Log.i("Cow", cid.toString());
                             }else{
                                 addTodoCow(cid, true, false);
                                 Log.i("Cow", cid.toString());
