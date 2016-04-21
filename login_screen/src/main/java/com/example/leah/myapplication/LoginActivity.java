@@ -379,32 +379,38 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     JSONObject resp = new JSONObject(getHttpResponse(conn));
+                    Log.i("login resp", resp.toString());
                     JSONObject data = resp.getJSONObject("data");
-                    String token = data.getString("id");
+                    JSONObject attr = data.getJSONObject("attributes");
+
+                    String token = attr.getString("id");
+                    Log.i("token", token);
                     //test
-                    JSONArray includedData = resp.getJSONArray("included");
-                    JSONObject includedData1 = includedData.getJSONObject(0);
-                    JSONObject relationship = includedData1.getJSONObject("relationships");
-                    JSONObject worksFor = relationship.getJSONObject("works_for");
-                    JSONArray finalDataArray = worksFor.getJSONArray("data");
-                    JSONObject finalData = finalDataArray.getJSONObject(0);
-                    String farmID = finalData.getString("id");
-
-
-                    //get treatment plan
-                    JSONObject includedData2 = includedData.getJSONObject(1);
-
-                    String treatmentPlan = includedData2.getJSONObject("attributes").getString("default_treatment_plan");
-
-
-
-                    //test
-
-
                     SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
+
+                    JSONArray includedData = resp.getJSONArray("included");
+                    for(int i =0; i < includedData.length();i++){
+                        JSONObject one = includedData.getJSONObject(i);
+                        if(one.get("type").equals("farms")){
+                            String farmID = one.getString("id");
+                            sp.edit().putString("farmID",farmID).apply();//add farmID to sp
+
+                            JSONObject farmAttr = one.getJSONObject("attributes");
+                            String treatmentPlan = farmAttr.getString("default_treatment_plan");
+                            sp.edit().putString("treatmentID",treatmentPlan).apply();//add treatmentID to sp
+
+
+                        }
+                    }
+
+
+
+
+
+                    //test
+
+
                     sp.edit().putString("token", token).apply();  //adds token to shared preferences
-                    sp.edit().putString("farmID",farmID).apply();//add farmID to sp
-                    sp.edit().putString("treatmentID",treatmentPlan).apply();//add treatmentID to sp
 
                     Log.i("doInBackground1", sp.getString("token", "NO_TOKEN_FOUND"));
                     Log.i("doInBackground2", sp.getString("farmID", "NO_FARM_FOUND"));

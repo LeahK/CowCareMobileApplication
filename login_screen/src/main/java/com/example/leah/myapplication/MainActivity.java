@@ -35,6 +35,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -92,7 +96,6 @@ public class MainActivity extends AppCompatActivity
         //listTodoAdapter.notifyDataSetChanged();
 
         populateTodoList();
-
         addWaitingCow(456L, false, true);
 
         // every time the data set is changed, you have to notify the adapter
@@ -348,7 +351,14 @@ public class MainActivity extends AppCompatActivity
                             Long cid = Long.valueOf(cowAttributes.getString("cid"));
 
                             //display cow into two lists
-                            if (cowAttributes.getBoolean("waiting") && (true)){
+                            String time = cowAttributes.getString("wait_expires");
+                            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+                            Date now = new Date();
+                            String currentDate = sdf.format(now);
+
+                            Date date1 = sdf.parse(time);
+                            Date date2 = sdf.parse(currentDate);
+                            if (cowAttributes.getBoolean("waiting") && date2.after(date1)){
                                 addWaitingCow(cid, false, true);
                                 Log.i("Cow", cid.toString());
                             }else{
@@ -401,5 +411,6 @@ public class MainActivity extends AppCompatActivity
 
 
     }
+
 
 }
