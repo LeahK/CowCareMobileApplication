@@ -340,7 +340,6 @@ public class MainActivity extends AppCompatActivity
                     Log.i("success",conn.getResponseMessage());
 
                     JSONObject resp = new JSONObject(getHttpResponse(conn));
-                    Log.i("resp",resp.toString());
                     //test
                     JSONArray includedArray = resp.getJSONArray("included");
 
@@ -349,16 +348,18 @@ public class MainActivity extends AppCompatActivity
                         if(cow.getString("type").equals("calves")){
                             JSONObject cowAttributes = cow.getJSONObject("attributes");
                             Long cid = Long.valueOf(cowAttributes.getString("cid"));
+                            Log.i("cid",cid.toString());
 
                             //display cow into two lists
-                            String time = cowAttributes.getString("wait_expires");
-                            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
-                            Date now = new Date();
-                            String currentDate = sdf.format(now);
+                            //String time = cowAttributes.getString("wait_expires");
+                            //SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+                            //Date now = new Date();
+                            //String currentDate = sdf.format(now);
 
-                            Date date1 = sdf.parse(time);
-                            Date date2 = sdf.parse(currentDate);
-                            if (cowAttributes.getBoolean("waiting") && date2.after(date1)){
+                            //Date date1 = sdf.parse(time);
+                            //Date date2 = sdf.parse(currentDate);
+                            if (cowAttributes.getBoolean("waiting")){
+                                if 
                                 addWaitingCow(cid, false, true);
                                 Log.i("Cow", cid.toString());
                             }else{
