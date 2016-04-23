@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         // set up refreshbutton
         FloatingActionButton refreshButton = (FloatingActionButton) findViewById(R.id.refresh);
         refreshButton.setOnClickListener(new View.OnClickListener() {
