@@ -12,12 +12,12 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="Katy's Cow Care"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
-            android:label="@string/app_name">
+            android:label="Login">
             HttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost("@string/mock_server");
             <intent-filter>
@@ -28,13 +28,17 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main"
+            android:label="Your Cows"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".AddNewCow" />
-        <activity android:name=".CowInformation" />
-        <activity android:name=".NextStep" />
+        <activity android:name=".AddNewCow"
+            android:label="Add New Cow" />
+        <activity android:name=".CowInformation"
+            android:label="Cow Information" />
+        <activity android:name=".NextStep"
+            android:label="Follow Up" />
         <activity android:name=".TEMP" />
-        <activity android:name=".SignUp"></activity>
+        <activity android:name=".SignUp"
+            android:label="Sign Up" ></activity>
     </application>
 
 </manifest>

@@ -40,8 +40,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     // some variables for TabHost view
     ArrayList<Cow> todoCows = new ArrayList<Cow>();
@@ -78,12 +77,6 @@ public class MainActivity extends AppCompatActivity
         // okay, now add the tab.
         tabHost.addTab(tabSpec);
 
-
-        // @TODO --> replace this once we get working with API/SERVER
-
-//        addTodoCow(123L, true, false);
-
-
         // populate the arrays with cows from the database
         mGetCowTask = new GetCowTask();
         mGetCowTask.execute((Void) null);
@@ -91,9 +84,11 @@ public class MainActivity extends AppCompatActivity
         // set up list adapters
         ArrayAdapter<Cow> todoAdapter = new listTodoAdapter();
         listViewTodoCows.setAdapter(todoAdapter);
+        todoAdapter.notifyDataSetChanged();
 
-        ArrayAdapter<Cow> waitAdapter = new listTodoAdapter();
+        ArrayAdapter<Cow> waitAdapter = new listWaitingAdapter();
         listViewWaitingCows.setAdapter(waitAdapter);
+        waitAdapter.notifyDataSetChanged();
 
         // repeat for additional tab
         tabSpec = tabHost.newTabSpec("WAITING");
@@ -104,7 +99,6 @@ public class MainActivity extends AppCompatActivity
         // okay, now add the tab.
         tabHost.addTab(tabSpec);
 
-
         // set up addNewCowButton
         Button addNewCowButton = (Button) findViewById(R.id.addNewCow);
         addNewCowButton.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +107,6 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(MainActivity.this, AddNewCow.class));
             }
         });
-
 
         // set up refreshbutton
         FloatingActionButton refreshButton = (FloatingActionButton) findViewById(R.id.refresh);
@@ -126,15 +119,6 @@ public class MainActivity extends AppCompatActivity
                 mGetCowTask.execute((Void) null);
             }
         });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        //navigationView.setNavigationItemSelectedListener(this);
     }
 
     // some methods
@@ -232,12 +216,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+        // updated to close application instead of going back to the login page
+        finish();
     }
 
     @Override
@@ -261,32 +241,6 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
 
     public class GetCowTask extends AsyncTask<Void, Void, Boolean>{
 
@@ -346,10 +300,15 @@ public class MainActivity extends AppCompatActivity
 
                             //display cow into two lists
 
-                            if (cowAttributes.getBoolean("waiting")){
+                            if (cowAttributes.getBoolean("waiting") == true){
                                 addWaitingCow(cid,false,true);
-                                Log.i("Cow", cid.toString());
-                            }else{
+                                Log.i("Cow Waiting", cid.toString());
+                            }
+                            if (cowAttributes.getBoolean("waiting") == false){
+                                addTodoCow(cid, true, false);
+                                Log.i("Cow Todo: ", cid.toString());
+                            }
+                            else{
                                 addTodoCow(cid, true, false);
                                 Log.i("Cow", cid.toString());
 
