@@ -61,10 +61,6 @@ public class MainActivity extends AppCompatActivity
 
         // set up the list views
         listViewTodoCows = (ListView) findViewById(R.id.listTodo);
-
-
-
-
         listViewWaitingCows = (ListView) findViewById(R.id.listWaiting);
 
         // tabHost is setup here
@@ -87,21 +83,17 @@ public class MainActivity extends AppCompatActivity
 
 //        addTodoCow(123L, true, false);
 
+
+        // populate the arrays with cows from the database
         mGetCowTask = new GetCowTask();
         mGetCowTask.execute((Void) null);
 
+        // set up list adapters
+        ArrayAdapter<Cow> todoAdapter = new listTodoAdapter();
+        listViewTodoCows.setAdapter(todoAdapter);
 
-
-        // every time the data set is changed, you have to notify the adapter
-        //listTodoAdapter.notifyDataSetChanged();
-
-        populateTodoList();
-//        addWaitingCow(456L, false, true);
-
-        // every time the data set is changed, you have to notify the adapter
-        // listWaitingAdapter.notifyDataSetChanged();
-
-        populateWaitingList();
+        ArrayAdapter<Cow> waitAdapter = new listTodoAdapter();
+        listViewWaitingCows.setAdapter(waitAdapter);
 
         // repeat for additional tab
         tabSpec = tabHost.newTabSpec("WAITING");
@@ -113,7 +105,7 @@ public class MainActivity extends AppCompatActivity
         tabHost.addTab(tabSpec);
 
 
-
+        // set up addNewCowButton
         Button addNewCowButton = (Button) findViewById(R.id.addNewCow);
         addNewCowButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,6 +114,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
+        // set up refreshbutton
         FloatingActionButton refreshButton = (FloatingActionButton) findViewById(R.id.refresh);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,10 +126,6 @@ public class MainActivity extends AppCompatActivity
                 mGetCowTask.execute((Void) null);
             }
         });
-
-
-
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -156,12 +146,6 @@ public class MainActivity extends AppCompatActivity
         // note that Boolean isTodo will ALWAYS be true here and isWaiting will ALWAYS be false
         todoCows.add(new Cow(cowID, isTodo, isWaiting));
     }
-
-    private void populateTodoList(){
-        ArrayAdapter<Cow> adapter = new listTodoAdapter();
-        listViewTodoCows.setAdapter(adapter);
-    }
-
 
     private class listTodoAdapter extends ArrayAdapter<Cow> {
         // constructor
@@ -204,11 +188,6 @@ public class MainActivity extends AppCompatActivity
     private void addWaitingCow(long cowID, boolean isTodo, boolean isWaiting){
         // note that Boolean isTodo will ALWAYS be true here and isWaiting will ALWAYS be false
         waitingCows.add(new Cow(cowID, isTodo, isWaiting));
-    }
-
-    private void populateWaitingList(){
-        ArrayAdapter<Cow> adapter = new listWaitingAdapter();
-        listViewWaitingCows.setAdapter(adapter);
     }
 
     private class listWaitingAdapter extends ArrayAdapter<Cow> {
