@@ -3,8 +3,10 @@ package com.example.leah.myapplication;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -82,11 +84,11 @@ public class MainActivity extends AppCompatActivity {
         mGetCowTask.execute((Void) null);
 
         // set up list adapters
-        ArrayAdapter<Cow> todoAdapter = new listTodoAdapter();
+        final ArrayAdapter<Cow> todoAdapter = new listTodoAdapter();
         listViewTodoCows.setAdapter(todoAdapter);
         todoAdapter.notifyDataSetChanged();
 
-        ArrayAdapter<Cow> waitAdapter = new listWaitingAdapter();
+        final ArrayAdapter<Cow> waitAdapter = new listWaitingAdapter();
         listViewWaitingCows.setAdapter(waitAdapter);
         waitAdapter.notifyDataSetChanged();
 
@@ -96,11 +98,12 @@ public class MainActivity extends AppCompatActivity {
         tabSpec.setContent(R.id.tabWaiting);
         // what's the text of the tab?
         tabSpec.setIndicator("WAITING");
+
         // okay, now add the tab.
         tabHost.addTab(tabSpec);
 
         // set up addNewCowButton
-        Button addNewCowButton = (Button) findViewById(R.id.addNewCow);
+        FloatingActionButton addNewCowButton = (FloatingActionButton) findViewById(R.id.addNewCow);
         addNewCowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,15 +111,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // set up refreshbutton
+        // set up refresh button
         FloatingActionButton refreshButton = (FloatingActionButton) findViewById(R.id.refresh);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                todoCows = new ArrayList<Cow>();
-                waitingCows = new ArrayList<Cow>();
                 mGetCowTask = new GetCowTask();
                 mGetCowTask.execute((Void) null);
+
+                // notify the adapters that their data sets have changed
+                todoAdapter.notifyDataSetChanged();
+                waitAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -213,11 +218,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public boolean checkIfCowInWaitArray(long id){
+        for (Cow cow : waitingCows){
+            if (cow.getCowID() == id){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkIfCowInTodoArray(long id){
+        for (Cow cow : todoCows){
+            if (cow.getCowID() == id){
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public void onBackPressed() {
         // updated to close application instead of going back to the login page
-        finish();
+        this.finish();
     }
 
     @Override
@@ -301,17 +323,21 @@ public class MainActivity extends AppCompatActivity {
                             //display cow into two lists
 
                             if (cowAttributes.getBoolean("waiting") == true){
-                                addWaitingCow(cid,false,true);
-                                Log.i("Cow Waiting", cid.toString());
+                                // only add the cow if it's not already in the array
+                                if (checkIfCowInWaitArray(cid) == false){
+                                    addWaitingCow(cid,false,true);
+                                    Log.i("Cow Waiting", cid.toString());
+                                }
                             }
                             if (cowAttributes.getBoolean("waiting") == false){
-                                addTodoCow(cid, true, false);
-                                Log.i("Cow Todo: ", cid.toString());
+                                // only add the cow if it's not already in the array
+                                if (checkIfCowInTodoArray(cid) == false){
+                                    addTodoCow(cid, true, false);
+                                    Log.i("Cow Todo: ", cid.toString());
+                                }
                             }
                             else{
-                                addTodoCow(cid, true, false);
-                                Log.i("Cow", cid.toString());
-
+                                // don't add to either!
                             }
 
                         }
@@ -354,8 +380,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onCancelled() {
             mGetCowTask = null;
         }
-
-
 
     }
 

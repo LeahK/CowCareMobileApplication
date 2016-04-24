@@ -3,5 +3,7 @@
     <color name="colorPrimary">#000000</color>
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#000000</color>
-    <color name="background_material_light">#ffffff</color>
+    <color name="background_material_light">#fffefe</color>
+    <color name="grey">#CCD3D3D3</color>
+    <color name="colorBackground">#ffffff</color>
 </resources>

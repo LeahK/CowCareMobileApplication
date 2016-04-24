@@ -12,14 +12,6 @@
     tools:context="com.example.leah.myapplication.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/add_new_cow"
-        android:id="@+id/addNewCow"
-        android:layout_marginTop="500dp" />
-
-
     <TabHost
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -31,7 +23,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:weightSum="1">
 
             <TabWidget
                 android:id="@android:id/tabs"
@@ -43,17 +36,24 @@
             <FrameLayout
                 android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="245dp"
+                android:layout_weight="0.75">
 
                 <LinearLayout
                     android:id="@+id/tabTodo"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:showDividers="none">
 
                     <ListView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:scrollbarAlwaysDrawVerticalTrack="true"
+                        android:fadeScrollbars="false"
+                        android:divider="@null"
+                        android:dividerHeight="6dp"
                         android:id="@+id/listTodo" />
 
                 </LinearLayout>
@@ -62,11 +62,17 @@
                     android:id="@+id/tabWaiting"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:showDividers="none">
 
                     <ListView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:scrollbarAlwaysDrawVerticalTrack="true"
+                        android:fadeScrollbars="false"
+                        android:divider="@null"
+                        android:dividerHeight="6dp"
                         android:id="@+id/listWaiting" />
                 </LinearLayout>
 
