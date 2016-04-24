@@ -85,12 +85,8 @@ public class MainActivity extends AppCompatActivity {
 
         // set up list adapters
         final ArrayAdapter<Cow> todoAdapter = new listTodoAdapter();
-        listViewTodoCows.setAdapter(todoAdapter);
-        todoAdapter.notifyDataSetInvalidated();
 
         final ArrayAdapter<Cow> waitAdapter = new listWaitingAdapter();
-        listViewWaitingCows.setAdapter(waitAdapter);
-        waitAdapter.notifyDataSetInvalidated();
 
         // repeat for additional tab
         tabSpec = tabHost.newTabSpec("WAITING");
