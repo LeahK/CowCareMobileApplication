@@ -31,7 +31,11 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class NextStep extends AppCompatActivity {
 
@@ -53,15 +57,22 @@ public class NextStep extends AppCompatActivity {
         cowIdView.setText("Cow id: " + cowID);
         mGetPlanTask = new GetPlanTask();
         mGetPlanTask.execute((Void) null);
+
+
+
+    }
+
+
+    private void Display(){
+        SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
+
         //display the steps
         int size = sp.getInt("numOfChild", 0);
-
-
         //Array list of countries
         final ArrayList<Step> stepList = new ArrayList<Step>();
         for (int i = 0; i < size;i++){
-            String key1 = "child"+i;
-            String key2 = "time"+i;
+            String key1 = "description"+i;
+            String key2 = "wait_time"+i;
 
             String id = "waiting time: "+ sp.getString(key2,"no des found")+"days";
             String des = sp.getString(key1,"no time found");
@@ -86,6 +97,7 @@ public class NextStep extends AppCompatActivity {
                 for (int i =0; i < stepList.size();i++){
                     if(stepList.get(i).isSelected()){
                         check++;
+                        key =i;
 
                     }
                 }
@@ -95,6 +107,7 @@ public class NextStep extends AppCompatActivity {
                             ,
                             Toast.LENGTH_LONG).show();
                 }else if(check ==1){
+
                     mUpdateCowTask = new UpdateCowTask(key);
                     mUpdateCowTask.execute((Void) null);
                 }else if(check > 1){
@@ -106,9 +119,7 @@ public class NextStep extends AppCompatActivity {
 
             }
         });
-
     }
-
 
     private class MyCustomAdapter extends ArrayAdapter<Step> {
 
@@ -222,18 +233,12 @@ public class NextStep extends AppCompatActivity {
                 SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    Log.i("success",conn.getResponseMessage());
+                    Log.i("GetPlan success",conn.getResponseMessage());
 
                     JSONObject resp = new JSONObject(getHttpResponse(conn));
-                    Log.i("treatment: ", resp.toString());
-                    //test
-
                     String currentState = resp.getJSONObject("data").getJSONObject("attributes").getString("treatment_plan_position");
-                    Log.i("currentState", currentState);
                     JSONObject planBody = resp.getJSONArray("included").getJSONObject(0).getJSONObject("attributes").getJSONObject("body");
-
                     String head = planBody.getString("head");
-
 
                     if(currentState.equals("null")){
                         JSONObject headJson = planBody.getJSONObject(head);
@@ -242,49 +247,50 @@ public class NextStep extends AppCompatActivity {
                         Log.i("child", children.toString());
                         sp.edit().putInt("numOfChild",children.length()).apply();
 
+
                         for (int i =0; i< children.length();i++){
-                            String child = children.getString(i);
-                            String des = planBody.getJSONObject(child).getString("description");
-                            String time = planBody.getJSONObject(child).getString("wait");
+                            String childId = children.getString(i);
+                            String des = planBody.getJSONObject(childId).getString("description");
+                            String time = planBody.getJSONObject(childId).getString("wait");
 
                             Log.i("des"+i,des);
-                            String key1 = "child"+i;
-                            String key2 = "time"+i;
-                            String key3 = "id" +i;
-                            sp.edit().putString(key1,des).apply();
-                            sp.edit().putString(key2,time).apply();
-                            sp.edit().putString(key3,child).apply();
+                            String description = "description"+i;
+                            String wait_time = "wait_time"+i;
+                            String child_id = "id" +i;
+                            sp.edit().putString(description,des).apply();
+                            sp.edit().putString(wait_time,time).apply();
+                            sp.edit().putString(child_id,childId).apply();
 
-                            Log.i(key3,child);
+                            Log.i(child_id,childId);
 
 
                         }
                     }else{
+
                         JSONArray children = planBody.getJSONObject(currentState).getJSONArray("children");
+                        if(children.length()==0){
+                            startActivity(new Intent(NextStep.this, MainActivity.class));
+                        }
                         sp.edit().putInt("numOfChild",children.length()).apply();
 
-                        for (int i =0; i< children.length();i++){
-                            String child = children.getString(i);
-                            String des = planBody.getJSONObject(child).getString("description");
-                            String time = planBody.getJSONObject(child).getString("wait");
+                        for (int i = 0; i< children.length();i++){
+                            String childId = children.getString(i);
+                            String des = planBody.getJSONObject(childId).getString("description");
+                            String time = planBody.getJSONObject(childId).getString("wait");
 
                             Log.i("des" + i, des);
-                            String key1 = "child"+i;
-                            String key2 = "time"+i;
-                            String key3 = "id" +i;
-
-
-                            sp.edit().putString(key1,des).apply();
-                            sp.edit().putString(key2,time).apply();
-                            sp.edit().putString(key3,child).apply();
+                            String description = "description"+i;
+                            String wait_time = "wait_time"+i;
+                            String child_id = "id" +i;
+                            sp.edit().putString(description,des).apply();
+                            sp.edit().putString(wait_time,time).apply();
+                            sp.edit().putString(child_id,childId).apply();
 
 
                         }
 
                     }
-                    //Object childStates = planBody.getJSONObject(currentState).get("children");
-                    //Log.i("child states", childStates.toString());
-                    //test
+
                 } else {
                     result = false;
                     Log.i("doInBackground", conn.getResponseMessage());
@@ -302,10 +308,10 @@ public class NextStep extends AppCompatActivity {
 
             if (success) {
                 // finish();
-                // on success, we want to redirect to main activity
-                Log.i("psotExecuted", "successed");
+                Display();
+                Log.i("GetPlan postExecuted", "success");
             } else {
-                Log.i("psotExecuted", "Not successed");
+                Log.i("GetPlan postExecuted", "Not success");
 
             }
         }
@@ -324,7 +330,6 @@ public class NextStep extends AppCompatActivity {
 
 
         SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
-        String token = sp.getString("token", "NO_TOKEN_FOUND");
 
         String cowID = sp.getString("currentCow", "NO_COW_FOUND");
         String farmID = sp.getString("farmID", "NO_COW_FOUND");
@@ -333,33 +338,56 @@ public class NextStep extends AppCompatActivity {
 
         UpdateCowTask(int key){
             mStepID = "id"+ key;
-            mTimeID = "time"+key;
+            mTimeID = "wait_time"+key;
 
         }
         protected String makeUpdateCowRequest(){
+
             JSONObject postData = new JSONObject();
             JSONObject data = new JSONObject();
             String type = "calves";
             boolean waiting = false;
-            String waitExp = (String) JSONObject.NULL;
+            String waitExp = null;
             String cowid = farmID+"_"+cowID;
 
             Log.i("key",mStepID);
 
             String childID = sp.getString(mStepID,"no step id found");
-            String timeS = sp.getString(mTimeID, "no time is found");
-            int time = Integer.parseInt(timeS);
-            if(time != 0){
+            String wait_time_string = sp.getString(mTimeID, "no time is found");
+
+            int wait_time = Integer.parseInt(wait_time_string);
+            sp.edit().putInt("checkTime",wait_time).apply();
+
+            if(wait_time != 0){
                 waiting = true;
-                waitExp ="1991-11-11";
+                Date we = new Date();
+                SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd");
+                Calendar c = Calendar.getInstance();
+                c.setTime(new Date());
+                c.add(Calendar.DATE, wait_time);
+                waitExp = dateFormat.format(c.getTime());
+            }else{
+                Log.i("ggggg","getin");
+                waiting = false;
+                waitExp = "";
+
             }
+            Log.i("wait exp",waitExp.toString());
+
             JSONObject attributes = new JSONObject();
 
 
             try {
+
+
+
                 attributes.put("treatment_plan_position", childID);
                 attributes.put("waiting", waiting);
+                if (waitExp != ""){
                 attributes.put("wait_expires", waitExp);
+                }else{
+                    attributes.put("wait_expires", JSONObject.NULL);
+                }
                 data.put("type", type);
                 data.put("id", cowid);
 
@@ -393,19 +421,21 @@ public class NextStep extends AppCompatActivity {
 
         protected Boolean doInBackground(Void... params) {
             Boolean result = true;
+            SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
+            String token = sp.getString("token", "NO_TOKEN_FOUND");
+            Log.i("do in background", "yep, I get called");
+
 
             try {
                 String postData = makeUpdateCowRequest();
+                Log.i("update postdata: ", postData);
 
                 URL url = new URL(request);
-                Log.i("url", url.toString());
-
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setDoOutput(true);
                 conn.setInstanceFollowRedirects(false);
+                //conn.setRequestProperty("X-HTTP-Method-Override", "PATCH");
                 conn.setRequestMethod("PATCH");
-
-
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Authorization", token);
                 conn.setRequestProperty("charset", "utf-8");
@@ -413,18 +443,14 @@ public class NextStep extends AppCompatActivity {
                 conn.setUseCaches(false);
 
                 OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-
                 wr.write(postData);
-                Log.i("postdat", postData.toString());
                 wr.close();
+                Log.i("update post data",postData);
+
 
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    Log.i("success",conn.getResponseMessage());
-
-                    JSONObject resp = new JSONObject(getHttpResponse(conn));
-                    Log.i("update cow: ", resp.toString());
-
+                    Log.i("update success",conn.getResponseMessage());
 
                     //Object childStates = planBody.getJSONObject(currentState).get("children");
                     //Log.i("child states", childStates.toString());
@@ -447,10 +473,20 @@ public class NextStep extends AppCompatActivity {
             if (success) {
                 // finish();
                 // on success, we want to redirect to main activity
-                startActivity(new Intent(NextStep.this, MainActivity.class));
-                Log.i("psotExecuted", "successed");
+
+                SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
+                int checkTime = sp.getInt("checkTime", 0);
+                if (checkTime == 0){
+
+                    finish();
+                    startActivity(getIntent());
+
+                }else {
+                    startActivity(new Intent(NextStep.this, MainActivity.class));
+                }
+                Log.i("update postExecuted", "success");
             } else {
-                Log.i("psotExecuted", "Not successed");
+                Log.i("update postExecuted", "Not success");
 
             }
         }

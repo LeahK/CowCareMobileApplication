@@ -112,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                todoCows.clear();
+                waitingCows.clear();
+
                 mGetCowTask = new GetCowTask();
                 mGetCowTask.execute((Void) null);
 
@@ -127,9 +130,9 @@ public class MainActivity extends AppCompatActivity {
     // @TODO --> this will need to work with API to grab the list of cows and then filter
     // @TODO --> ... based on whether they belong in "todo" list or not
 
-    private void addTodoCow(long cowID, boolean isTodo, boolean isWaiting){
+    private void addTodoCow(long cowID){
         // note that Boolean isTodo will ALWAYS be true here and isWaiting will ALWAYS be false
-        todoCows.add(new Cow(cowID, isTodo, isWaiting));
+        todoCows.add(new Cow(cowID, true, false));
     }
 
     private class listTodoAdapter extends ArrayAdapter<Cow> {
@@ -172,9 +175,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void addWaitingCow(long cowID, boolean isTodo, boolean isWaiting){
-        // note that Boolean isTodo will ALWAYS be true here and isWaiting will ALWAYS be false
-        waitingCows.add(new Cow(cowID, isTodo, isWaiting));
+    private void addWaitingCow(long cowID){
+        waitingCows.add(new Cow(cowID, false, true));
     }
 
     private class listWaitingAdapter extends ArrayAdapter<Cow> {
@@ -202,12 +204,12 @@ public class MainActivity extends AppCompatActivity {
             String cowID_text = String.valueOf(cowID);
             waitingCowID.setText(cowID_text);
 
-            waitingCowID.setOnClickListener(new View.OnClickListener() {
+            /*waitingCowID.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     startActivity(new Intent(MainActivity.this, CowInformation.class));
                 }
-            });
+            });*/
 
             // when done setting all the text and shtuff
             // return the view
@@ -264,6 +266,7 @@ public class MainActivity extends AppCompatActivity {
 
     public class GetCowTask extends AsyncTask<Void, Void, Boolean>{
 
+
         SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
         String token = sp.getString("token", "NO_TOKEN_FOUND");
 
@@ -316,33 +319,43 @@ public class MainActivity extends AppCompatActivity {
                         if(cow.getString("type").equals("calves")){
                             JSONObject cowAttributes = cow.getJSONObject("attributes");
                             Long cid = Long.valueOf(cowAttributes.getString("cid"));
-                            Log.i("cid",cid.toString());
 
                             //display cow into two lists
 
                             if (cowAttributes.getBoolean("waiting")){
                                 // only add the cow if it's not already in the array
-                                if (!checkIfCowInWaitArray(cid)){
-                                    addWaitingCow(cid,false,true);
-                                    Log.i("Cow Waiting", cid.toString());
-                                }
-                            }
-                            if (!cowAttributes.getBoolean("waiting")){
-                                // only add the cow if it's not already in the array
-                                if (!checkIfCowInTodoArray(cid)){
-                                    addTodoCow(cid, true, false);
-                                    Log.i("Cow Todo: ", cid.toString());
-                                }
-                            }
-                            else{
-                                // don't add to either!
-                            }
 
+                                if (cowAttributes.getString("wait_expires") != null){
+                                    SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH);
+                                    Date now = new Date(); // when creating a new date the date is the current time
+                                    //String currentDate = sdf.format(now);
+                                    String wait_expires = cowAttributes.getString("wait_expires"); // time as a string
+                                    Date date_wait_expires = sdf.parse(wait_expires);
+                                    //is wait expires in the past?
+
+                                    if (date_wait_expires.before(now)){ // COW IS ON ToDoList
+                                        Log.i("cid for to do", cid.toString());
+                                        Log.i("current time", now.toString());
+                                        Log.i("waitExp time", date_wait_expires.toString());
+                                        if(!checkIfCowInTodoArray(cid)) {
+                                            addTodoCow(cid);
+                                        }
+                                    }else { // COW IS ON WAIT LIST
+                                        if(!checkIfCowInWaitArray(cid)){
+                                            addWaitingCow(cid);
+                                        }
+                                        Log.i("cid for waiting", cid.toString());
+                                        Log.i("current time", now.toString());
+                                        Log.i("waitExp time", date_wait_expires.toString());
+
+                                    }
+                                }
+                            }else{
+                                Log.i("neither cid: ", cid.toString());
+                                //cow is in neither list.  Happy Happy Joy Joy, the cow is dead or cured.
+                            }
                         }
-
-
                     }
-
                     //test
 
                 } else {

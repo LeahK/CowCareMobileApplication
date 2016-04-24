@@ -156,10 +156,13 @@ public class AddNewCow extends AppCompatActivity {
             JSONObject farmData = new JSONObject();
             JSONObject treatment_plan = new JSONObject();
             JSONObject treatment_Data = new JSONObject();
+            String date = "2001-01-01";//this will the date in the past to make this cow in to do list
 
             try {
                 attributes.put("cid", mCowID);
                 attributes.put("name", mCowName);
+                attributes.put("waiting", true);
+                attributes.put("wait_expires",date);
 
                 farmData.put("type", typeFarm);
                 farmData.put("id", mFarmID);
@@ -204,7 +207,6 @@ public class AddNewCow extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             Boolean result = true;
-            Log.i("do in background", "yep, I get called");
             SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
             String token = sp.getString("token","NO farm found");
 
