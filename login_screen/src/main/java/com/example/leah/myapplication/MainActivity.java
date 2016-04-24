@@ -153,12 +153,14 @@ public class MainActivity extends AppCompatActivity {
 
             // set the text in the text view
             long cowID = currentCow.getCowID();
-            String cowID_text = String.valueOf(cowID);
+            final String cowID_text = String.valueOf(cowID);
             todoCowID.setText(cowID_text);
 
             todoCowID.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
+                    sp.edit().putString("currentCow", cowID_text).apply();
                     startActivity(new Intent(MainActivity.this, NextStep.class));
                 }
             });
@@ -318,16 +320,16 @@ public class MainActivity extends AppCompatActivity {
 
                             //display cow into two lists
 
-                            if (cowAttributes.getBoolean("waiting") == true){
+                            if (cowAttributes.getBoolean("waiting")){
                                 // only add the cow if it's not already in the array
-                                if (checkIfCowInWaitArray(cid) == false){
+                                if (!checkIfCowInWaitArray(cid)){
                                     addWaitingCow(cid,false,true);
                                     Log.i("Cow Waiting", cid.toString());
                                 }
                             }
-                            if (cowAttributes.getBoolean("waiting") == false){
+                            if (!cowAttributes.getBoolean("waiting")){
                                 // only add the cow if it's not already in the array
-                                if (checkIfCowInTodoArray(cid) == false){
+                                if (!checkIfCowInTodoArray(cid)){
                                     addTodoCow(cid, true, false);
                                     Log.i("Cow Todo: ", cid.toString());
                                 }
@@ -341,11 +343,7 @@ public class MainActivity extends AppCompatActivity {
 
                     }
 
-
-
-
                     //test
-
 
                 } else {
                     result = false;
