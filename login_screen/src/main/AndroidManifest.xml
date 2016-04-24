@@ -17,7 +17,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
-            android:label="Login">
+            android:label="Katy's Cow Care">
             HttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost("@string/mock_server");
             <intent-filter>
