@@ -86,11 +86,11 @@ public class MainActivity extends AppCompatActivity {
         // set up list adapters
         final ArrayAdapter<Cow> todoAdapter = new listTodoAdapter();
         listViewTodoCows.setAdapter(todoAdapter);
-        todoAdapter.notifyDataSetChanged();
+        todoAdapter.notifyDataSetInvalidated();
 
         final ArrayAdapter<Cow> waitAdapter = new listWaitingAdapter();
         listViewWaitingCows.setAdapter(waitAdapter);
-        waitAdapter.notifyDataSetChanged();
+        waitAdapter.notifyDataSetInvalidated();
 
         // repeat for additional tab
         tabSpec = tabHost.newTabSpec("WAITING");
@@ -369,6 +369,13 @@ public class MainActivity extends AppCompatActivity {
             if (success) {
                 // finish();
                 // on success, we want to redirect to main activity
+                ArrayAdapter<Cow> todoAdapter = new listTodoAdapter();
+                listViewTodoCows.setAdapter(todoAdapter);
+                todoAdapter.notifyDataSetInvalidated();
+
+                ArrayAdapter<Cow> waitAdapter = new listWaitingAdapter();
+                listViewWaitingCows.setAdapter(waitAdapter);
+                waitAdapter.notifyDataSetInvalidated();
                 Log.i("psotExecuted", "successed");
             } else {
                 Log.i("psotExecuted", "Not successed");
