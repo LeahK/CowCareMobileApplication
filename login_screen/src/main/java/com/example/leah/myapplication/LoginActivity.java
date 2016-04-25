@@ -392,6 +392,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     //test
                     SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
 
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.clear();
+                    editor.commit();
+
                     JSONArray includedData = resp.getJSONArray("included");
                     for(int i =0; i < includedData.length();i++){
                         JSONObject one = includedData.getJSONObject(i);
@@ -402,23 +406,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             JSONObject farmAttr = one.getJSONObject("attributes");
                             String treatmentPlan = farmAttr.getString("default_treatment_plan");
                             sp.edit().putString("treatmentID",treatmentPlan).apply();//add treatmentID to sp
-
-
                         }
                     }
-
-
-
-
-
-                    //test
-
-
                     sp.edit().putString("token", token).apply();  //adds token to shared preferences
 
+                    //the first time user login maybe will not receive th efarm id and treatment plan
+                    /*String temp = sp.getString("farmID", "NO_FARM_FOUND");
+                    if(temp.equals("NO_FARM_FOUND")){
+                        ReLogin(mEmail,mPassword);
+                    }*/
                     Log.i("doInBackground1", sp.getString("token", "NO_TOKEN_FOUND"));
                     Log.i("doInBackground2", sp.getString("farmID", "NO_FARM_FOUND"));
-                    Log.i("doInBackground3", sp.getString("treatmentID", "NO_FARM_FOUND"));
+                    Log.i("doInBackground3", sp.getString("treatmentID", "NO_treatment_FOUND"));
+
 
 
                 } else {
@@ -457,6 +457,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
     }
+    /*private void ReLogin(String email, String password){
+        mAuthTask = new UserLoginTask(email, password);
+        mAuthTask.execute((Void) null);
+    }*/
 
 
 

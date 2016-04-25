@@ -125,10 +125,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // some methods
-
-    // @TODO --> this will need to work with API to grab the list of cows and then filter
-    // @TODO --> ... based on whether they belong in "todo" list or not
 
     private void addTodoCow(long cowID){
         // note that Boolean isTodo will ALWAYS be true here and isWaiting will ALWAYS be false

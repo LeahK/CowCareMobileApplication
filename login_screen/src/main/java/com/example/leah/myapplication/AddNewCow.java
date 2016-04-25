@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import android.widget.Toast;
 
 
 
@@ -144,6 +145,7 @@ public class AddNewCow extends AppCompatActivity {
         }
 
         protected String makeAddNewCowRequest(){
+
             JSONObject postData = new JSONObject();
 
             JSONObject data = new JSONObject();
@@ -252,7 +254,7 @@ public class AddNewCow extends AppCompatActivity {
                 // on success, we want to redirect to main activity
                 startActivity(new Intent(AddNewCow.this, MainActivity.class));
             } else {
-                mCowIDView.setError(getString(R.string.error_incorrect_information));
+                mCowIDView.setError(getString(R.string.error_no_plan_or_id_already_exists));
                 mCowIDView.requestFocus();
             }
         }

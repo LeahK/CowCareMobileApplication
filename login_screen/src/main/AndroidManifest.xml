@@ -33,8 +33,6 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".AddNewCow"
             android:label="Add New Cow" />
-        <activity android:name=".CowInformation"
-            android:label="Cow Information" />
         <activity android:name=".NextStep"
             android:label="Follow Up" />
         <activity android:name=".TEMP" />

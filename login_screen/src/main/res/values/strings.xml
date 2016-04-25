@@ -40,7 +40,7 @@
     <string name="nmb">c. No medications on board, fit for transport</string>
     <string name="ut">d. Unfit for transport</string>
     <string name="title_activity_cow_information">CowInformation</string>
-    <string name="step1">No response to the treatment, condition declining</string>
+    <string name="error_no_plan_or_id_already_exists">No Treatment Plan Found Or the ID Already Exists</string>
     <string name="step2">Positive response to th etreatment, condition improved</string>
 
 

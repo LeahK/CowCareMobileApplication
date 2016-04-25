@@ -33,6 +33,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -42,6 +43,7 @@ public class NextStep extends AppCompatActivity {
     private GetPlanTask mGetPlanTask = null;
     MyCustomAdapter dataAdapter = null;
     private UpdateCowTask mUpdateCowTask = null;
+    private DeleteCowTask mDeleteCowTask = null;
 
 
 
@@ -74,7 +76,7 @@ public class NextStep extends AppCompatActivity {
             String key1 = "description"+i;
             String key2 = "wait_time"+i;
 
-            String id = "waiting time: "+ sp.getString(key2,"no des found")+"days";
+            String id = "waiting time: "+ sp.getString(key2,"no des found")+" days";
             String des = sp.getString(key1,"no time found");
             Step step = new Step(id,des,false);
             stepList.add(step);
@@ -92,7 +94,7 @@ public class NextStep extends AppCompatActivity {
         nextStep.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int check =0;
+                int check = 0;
                 int key = 0;
                 for (int i =0; i < stepList.size();i++){
                     if(stepList.get(i).isSelected()){
@@ -269,6 +271,10 @@ public class NextStep extends AppCompatActivity {
 
                         JSONArray children = planBody.getJSONObject(currentState).getJSONArray("children");
                         if(children.length()==0){
+                            //if no child, then delete the cow from server//////////////////////////////////////////
+                            Delete();
+
+
                             startActivity(new Intent(NextStep.this, MainActivity.class));
                         }
                         sp.edit().putInt("numOfChild",children.length()).apply();
@@ -360,26 +366,21 @@ public class NextStep extends AppCompatActivity {
 
             if(wait_time != 0){
                 waiting = true;
-                Date we = new Date();
                 SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd");
                 Calendar c = Calendar.getInstance();
                 c.setTime(new Date());
                 c.add(Calendar.DATE, wait_time);
                 waitExp = dateFormat.format(c.getTime());
             }else{
-                Log.i("ggggg","getin");
                 waiting = false;
                 waitExp = "";
 
             }
-            Log.i("wait exp",waitExp.toString());
 
             JSONObject attributes = new JSONObject();
 
 
             try {
-
-
 
                 attributes.put("treatment_plan_position", childID);
                 attributes.put("waiting", waiting);
@@ -423,8 +424,6 @@ public class NextStep extends AppCompatActivity {
             Boolean result = true;
             SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
             String token = sp.getString("token", "NO_TOKEN_FOUND");
-            Log.i("do in background", "yep, I get called");
-
 
             try {
                 String postData = makeUpdateCowRequest();
@@ -445,16 +444,13 @@ public class NextStep extends AppCompatActivity {
                 OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
                 wr.write(postData);
                 wr.close();
-                Log.i("update post data",postData);
+                Log.i("update post data", postData);
 
 
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     Log.i("update success",conn.getResponseMessage());
 
-                    //Object childStates = planBody.getJSONObject(currentState).get("children");
-                    //Log.i("child states", childStates.toString());
-                    //test
                 } else {
                     result = false;
                     Log.i("doInBackground", conn.getResponseMessage());
@@ -499,6 +495,95 @@ public class NextStep extends AppCompatActivity {
 
 
     }
+    public class DeleteCowTask extends AsyncTask<Void, Void, Boolean>{
+
+
+        SharedPreferences sp = getSharedPreferences("com.example.leah.myapplication", Context.MODE_PRIVATE);
+        String token = sp.getString("token", "NO_TOKEN_FOUND");
+
+        String farmID = sp.getString("farmID", "NO_TOKEN_FOUND");
+        String cowID = sp.getString("currentCow", "NO_COW_FOUND");
+        String request  = "http://katys-care-api.herokuapp.com/v1/calves/"+ farmID+"_"+cowID +"?include=calves.treatment_plan";
+
+        DeleteCowTask(){
+
+        }
+
+        protected String getHttpResponse(HttpURLConnection conn) {
+            String response = "";
+            StringBuilder sb = new StringBuilder();
+            try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line.concat("\n"));
+                }
+                br.close();
+                response = sb.toString();
+            } catch (Exception e){
+                Log.i("getHttpResponse", "Impossible Error");
+            }
+            return response;
+        }
+
+        protected Boolean doInBackground(Void... params) {
+            Boolean result = true;
+
+            try {
+                URL url = new URL(request);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                conn.setInstanceFollowRedirects(false);
+                conn.setRequestMethod("DELETE");
+                conn.setRequestProperty("Authorization", token);
+                conn.setRequestProperty("charset", "utf-8");
+                conn.setUseCaches(false);
+
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_CREATED || conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    Log.i("success",conn.getResponseMessage());
+
+                    JSONObject resp = new JSONObject(getHttpResponse(conn));
+
+                    Log.i("Delete resp",resp.toString());
+                } else {
+                    result = false;
+                    Log.i("doInBackground", conn.getResponseMessage());
+                }
+
+            } catch (Exception e) {
+                result = false;
+            }
+
+            return result;
+        }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mDeleteCowTask = null;
+
+            if (success) {
+                // finish();
+                // on success, we want to redirect to main activity
+
+                Log.i("delete psotExecuted", "successed");
+            } else {
+                Log.i("delete psotExecuted", "Not successed");
+
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mDeleteCowTask = null;
+        }
+
+    }
+    private void Delete(){
+        mDeleteCowTask = new DeleteCowTask();
+        mDeleteCowTask.execute((Void) null);
+
+    }
+
+
 
 }
 
