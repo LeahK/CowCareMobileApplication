@@ -52,8 +52,8 @@
                         android:orientation="vertical"
                         android:scrollbarAlwaysDrawVerticalTrack="true"
                         android:fadeScrollbars="false"
-                        android:divider="@null"
                         android:dividerHeight="6dp"
+                        android:divider="@null"
                         android:id="@+id/listTodo" />
 
                 </LinearLayout>
